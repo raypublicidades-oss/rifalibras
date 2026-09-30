@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rifa Beneficente - Projeto LIBRAS no Chile</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #f4f6f8; color: #333; padding: 20px; }
+    .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    h1 { color: #1e293b; text-align: center; margin-bottom: 10px; font-size: 24px; }
+    p.desc { text-align: center; color: #64748b; margin-bottom: 25px; font-size: 15px; }
+    .legenda { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; font-size: 14px; }
+    .legenda span { display: flex; align-items: center; gap: 5px; }
+    .dot { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+    .dot.disponivel { background: #e2e8f0; border: 1px solid #cbd5e1; }
+    .dot.selecionado { background: #2563eb; }
+    .dot.pendente { background: #f59e0b; }
+    .dot.pago { background: #10b981; }
+
+    .grid-cotas { display: grid; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); gap: 8px; margin-bottom: 25px; max-height: 350px; overflow-y: auto; padding: 5px; }
+    .cota { padding: 10px 0; text-align: center; font-weight: bold; font-size: 13px; border-radius: 6px; cursor: pointer; user-select: none; transition: 0.2s; }
+    .cota.disponivel { background: #e2e8f0; color: #334155; }
+    .cota.disponivel:hover { background: #cbd5e1; }
+    .cota.selecionado { background: #2563eb; color: #fff; }
+    .cota.pendente { background: #f59e0b; color: #fff; cursor: not-allowed; opacity: 0.8; }
+    .cota.pago { background: #10b981; color: #fff; cursor: not-allowed; }
+
+    .form-section { background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; }
+    .form-group { margin-bottom: 12px; }
+    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #475569; }
+    input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none; }
+    input:focus { border-color: #2563eb; }
+    
+    .btn-pagar { width: 100%; padding: 14px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; }
+    .btn-pagar:disabled { background: #9ca3af; cursor: not-allowed; }
+
+    #qr-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; }
+    .modal-content { background: #fff; padding: 25px; border-radius: 10px; text-align: center; max-width: 400px; width: 90%; }
+    .modal-content img { width: 200px; height: 200px; margin: 15px 0; }
+    textarea { width: 100%; height: 60px; font-size: 11px; padding: 8px; resize: none; margin-bottom: 10px; border-radius: 4px; border: 1px solid #ccc; }
+    .btn-copiar { background: #2563eb; color: #fff; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Apoie a Professora no Chile! ✈️</h1>
+  <p class="desc">Apresentação de Projeto de LIBRAS • R$ 10,00 por número</p>
+
+  <div class="legenda">
+    <span><i class="dot disponivel"></i> Livre</span>
+    <span><i class="dot selecionado"></i> Selecionado</span>
+    <span><i class="dot pendente"></i> Pendente</span>
+    <span><i class="dot pago"></i> Pago (Verde)</span>
+  </div>
+
+  <div class="grid-cotas" id="grid">Carregando números...</div>
+
+  <div class="form-section">
+    <h3>Números Selecionados: <span id="qtd-selecionados">0</span>/10 (R$ <span id="total-valor">0</span>)</h3>
+    <br>
+    <div class="form-group">
+      <label>Nome Completo:</label>
+      <input type="text" id="nome" placeholder="Digite seu nome">
+    </div>
+    <div class="form-group">
+      <label>E-mail:</label>
+      <input type="email" id="email" placeholder="seu@email.com">
+    </div>
+    <div class="form-group">
+      <label>Telefone (WhatsApp):</label>
+      <input type="tel" id="telefone" placeholder="(11) 99999-9999">
+    </div>
+    <button class="btn-pagar" id="btn-pagar" onclick="gerarPix()" disabled>Gerar Pix de Pagamento</button>
+  </div>
+</div>
+
+<div id="qr-modal">
+  <div class="modal-content">
+    <h2>Escaneie o QR Code</h2>
+    <p>Ou copie a chave Pix abaixo:</p>
+    <img id="qr-code-img" src="" alt="QR Code Pix">
+    <textarea id="pix-copia-cola" readonly></textarea>
+    <button class="btn-copiar" onclick="copiarPix()">Copiar Código Pix</button>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://swgdyqkiaxfovvsxfwav.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_SGisG1eE-Ua5iqXUHhX11A_tQ0xeLHs';
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let selecionados = [];
+
+  async function carregarCotas() {
+    // Executa limpeza de pendentes com mais de 30 minutos
+    await supabaseClient.rpc('limpar_reservas_expiradas');
+
+    const { data: cotas } = await supabaseClient.from('cotas').select('numero, status').order('numero', { ascending: true });
+    
+    const grid = document.getElementById('grid');
+    grid.innerHTML = '';
+
+    cotas.forEach(cota => {
+      const el = document.createElement('div');
+      el.className = `cota ${cota.status}`;
+      if (selecionados.includes(cota.numero)) el.classList.add('selecionado');
+      el.innerText = String(cota.numero).padStart(3, '0');
+
+      if (cota.status === 'disponivel') {
+        el.onclick = () => alternarSelecao(cota.numero);
+      }
+      grid.appendChild(el);
+    });
+  }
+
+  function alternarSelecao(num) {
+    if (selecionados.includes(num)) {
+      selecionados = selecionados.filter(n => n !== num);
+    } else {
+      if (selecionados.length >= 10) {
+        alert('Você só pode escolher até 10 números por vez!');
+        return;
+      }
+      selecionados.push(num);
+    }
+    atualizarResumo();
+    carregarCotas();
+  }
+
+  function atualizarResumo() {
+    document.getElementById('qtd-selecionados').innerText = selecionados.length;
+    document.getElementById('total-valor').innerText = selecionados.length * 10;
+    document.getElementById('btn-pagar').disabled = selecionados.length === 0;
+  }
+
+  async function gerarPix() {
+    const nome = document.getElementById('nome').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const telefone = document.getElementById('telefone').value.trim();
+
+    if (!nome || !email || !telefone) {
+      alert('Preencha seu Nome, Email e Telefone!');
+      return;
+    }
+
+    document.getElementById('btn-pagar').innerText = 'Gerando Pix...';
+    document.getElementById('btn-pagar').disabled = true;
+
+    try {
+      const res = await fetch('/api/pix', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ numeros: selecionados, nome, email, telefone })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || 'Erro ao gerar Pix');
+
+      document.getElementById('qr-code-img').src = `data:image/jpeg;base64,${data.pix_qr_code_base64}`;
+      document.getElementById('pix-copia-cola').value = data.pix_copia_cola;
+      document.getElementById('qr-modal').style.display = 'flex';
+
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      document.getElementById('btn-pagar').innerText = 'Gerar Pix de Pagamento';
+      document.getElementById('btn-pagar').disabled = false;
+    }
+  }
+
+  function copiarPix() {
+    const copyText = document.getElementById('pix-copia-cola');
+    copyText.select();
+    document.execCommand('copy');
+    alert('Código Pix copiado!');
+  }
+
+  // Atualização em tempo real (Supabase Realtime) quando alguém paga
+  supabaseClient
+    .channel('mudancas-cotas')
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'cotas' }, () => carregarCotas())
+    .subscribe();
+
+  carregarCotas();
+</script>
+
+</body>
+</html>
