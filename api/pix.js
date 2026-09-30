@@ -30,7 +30,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: `Você só pode reservar no máximo 10 números no total.` });
     }
 
-    // 3. Verifica se algum número selecionado foi pego no meio do caminho
+    // 3. Verifica se algum número selecionado foi pego por outra pessoa
     const { data: disponiveis } = await supabase
       .from('cotas')
       .select('numero')
@@ -41,13 +41,16 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Um ou mais números selecionados já foram reservados.' });
     }
 
-    // 4. Cria a cobrança Pix no Mercado Pago
+    // 4. Cria a cobrança Pix no Mercado Pago com X-Idempotency-Key
     const valorTotal = numeros.length * 10;
+    const idempotencyKey = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
     const mpRes = await fetch('https://api.mercadopago.com/v1/payments', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${process.env.MP_ACCESS_TOKEN}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-Idempotency-Key': idempotencyKey
       },
       body: JSON.stringify({
         transaction_amount: valorTotal,
@@ -64,7 +67,7 @@ export default async function handler(req, res) {
 
     if (!mpRes.ok) {
       console.error(mpData);
-      return res.status(500).json({ error: 'Erro ao gerar o Pix no Mercado Pago.' });
+      return res.status(500).json({ error: mpData.message || 'Erro ao gerar o Pix no Mercado Pago.' });
     }
 
     const pix_copia_cola = mpData.point_of_interaction.transaction_data.qr_code;
