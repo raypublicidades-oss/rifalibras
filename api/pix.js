@@ -1,101 +1,96 @@
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' });
-
-  const { numeros, nome, email, telefone } = req.body;
-
-  if (!numeros || !numeros.length || !nome || !email || !telefone) {
-    return res.status(400).json({ error: 'Dados incompletos.' });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Método não permitido' });
   }
 
   try {
-    // 1. Limpa reservas antigas expiradas
-    await supabase.rpc('limpar_reservas_expiradas');
+    const { numeros, nome, email, telefone } = req.body;
 
-    // 2. Verifica se a pessoa já excedeu o limite de 10 números
-    const { data: cotasExistentes } = await supabase
-      .from('cotas')
-      .select('numero')
-      .or(`email.eq.${email},telefone.eq.${telefone}`)
-      .in('status', ['pendente', 'pago']);
-
-    const totalAtual = (cotasExistentes ? cotasExistentes.length : 0) + numeros.length;
-    if (totalAtual > 10) {
-      return res.status(400).json({ error: `Você só pode reservar no máximo 10 números no total.` });
+    if (!numeros || !Array.isArray(numeros) || numeros.length === 0) {
+      return res.status(400).json({ error: 'Nenhum número selecionado.' });
     }
 
-    // 3. Verifica se algum número selecionado foi pego por outra pessoa
-    const { data: disponiveis } = await supabase
+    // 1. Verificar disponibilidade dos números
+    const { data: cotasExistentes, error: fetchError } = await supabase
       .from('cotas')
-      .select('numero')
-      .in('numero', numeros)
-      .eq('status', 'disponivel');
+      .select('numero, status')
+      .in('numero', numeros);
 
-    if (!disponiveis || disponiveis.length !== numeros.length) {
-      return res.status(400).json({ error: 'Um ou mais números selecionados já foram reservados.' });
+    if (fetchError) throw fetchError;
+
+    const indisponiveis = cotasExistentes.filter(c => c.status !== 'disponivel');
+    if (indisponiveis.length > 0) {
+      return res.status(400).json({ error: 'Alguns números escolhidos já não estão disponíveis.' });
     }
 
-    // 4. Cria a cobrança Pix no Mercado Pago com X-Idempotency-Key
-    const valorTotal = numeros.length * 10;
-    const idempotencyKey = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    // 2. Definir o valor para TESTES (R$ 0,01 fixo por transação)
+    // Para voltar ao normal após os testes, substitua pela linha:
+    // const valorTotal = numeros.length * 10;
+    const valorTotal = 0.01;
 
-    const mpRes = await fetch('https://api.mercadopago.com/v1/payments', {
+    // 3. Criar Pagamento no Mercado Pago
+    const mpResponse = await fetch('https://api.mercadopago.com/v1/payments', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${process.env.MP_ACCESS_TOKEN}`,
         'Content-Type': 'application/json',
-        'X-Idempotency-Key': idempotencyKey
+        'X-Idempotency-Key': `pix-${Date.now()}-${Math.random()}`
       },
       body: JSON.stringify({
         transaction_amount: valorTotal,
-        description: `Rifa Beneficente - Cotas: ${numeros.join(', ')}`,
+        description: `Rifa Libras - Cotas: ${numeros.join(', ')}`,
         payment_method_id: 'pix',
         payer: {
           email: email,
           first_name: nome,
-        }
+          phone: {
+            area_code: telefone.replace(/\D/g, '').substring(0, 2) || '61',
+            number: telefone.replace(/\D/g, '').substring(2) || '999999999'
+          }
+        },
+        notification_url: 'https://rifalibras.vercel.app/api/webhook'
       })
     });
 
-    const mpData = await mpRes.json();
+    const paymentData = await mpResponse.json();
 
-    if (!mpRes.ok) {
-      console.error(mpData);
-      return res.status(500).json({ error: mpData.message || 'Erro ao gerar o Pix no Mercado Pago.' });
+    if (!mpResponse.ok) {
+      console.error('Erro Mercado Pago:', paymentData);
+      return res.status(500).json({ error: paymentData.message || 'Erro ao gerar Pix no Mercado Pago.' });
     }
 
-    const pix_copia_cola = mpData.point_of_interaction.transaction_data.qr_code;
-    const pix_qr_code_base64 = mpData.point_of_interaction.transaction_data.qr_code_base64;
-    const mercado_pago_id = String(mpData.id);
-
-    // 5. Marca os números como 'pendente' no Supabase
-    await supabase
+    // 4. Reservar números no Supabase com o ID do pagamento Mercado Pago
+    const { error: updateError } = await supabase
       .from('cotas')
       .update({
         status: 'pendente',
-        nome,
-        email,
-        telefone,
-        pix_copia_cola,
-        pix_qr_code_base64,
-        mercado_pago_id,
-        created_at: new Date().toISOString()
+        nome_comprador: nome,
+        email_comprador: email,
+        telefone_comprador: telefone,
+        payment_id: String(paymentData.id),
+        updated_at: new Date().toISOString()
       })
       .in('numero', numeros);
 
+    if (updateError) throw updateError;
+
+    // 5. Retornar os dados do Pix para a página
     return res.status(200).json({
-      pix_copia_cola,
-      pix_qr_code_base64,
-      mercado_pago_id
+      success: true,
+      payment_id: paymentData.id,
+      pix_copia_cola: paymentData.point_of_interaction.transaction_data.qr_code,
+      pix_qr_code_base64: paymentData.point_of_interaction.transaction_data.qr_code_base64
     });
 
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    console.error('Erro geral no Pix:', err);
+    return res.status(500).json({ error: err.message || 'Erro interno no servidor.' });
   }
 }
