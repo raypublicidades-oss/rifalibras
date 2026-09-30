@@ -36,8 +36,10 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Alguns números escolhidos já não estão disponíveis.' });
     }
 
-    // 3. Configura o Mercado Pago (R$ 0,01 fixo para teste)
-    const valorTotal = 0.01;
+    // 3. Valor real da cota: R$ 10,00 por número selecionado
+    const precoPorCota = 10.00;
+    const valorTotal = numeros.length * precoPorCota;
+
     const tokenMP = process.env.MP_ACCESS_TOKEN || process.env.MP_ACCESS_TOKEN_TEST;
 
     if (!tokenMP) {
@@ -74,7 +76,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: paymentData.message || 'Erro ao gerar Pix no Mercado Pago.' });
     }
 
-    // 4. Reservar números como 'pendente' e salvar nome, telefone, email e payment_id
+    // 4. Reservar números como 'pendente' e salvar dados do comprador
     const { error: updateError } = await supabase
       .from('cotas')
       .update({
