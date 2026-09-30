@@ -1,9 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+// Mapeia para as variáveis que já estão configuradas na Vercel
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://swgdyqkiaxfovvsxfwav.supabase.co";
+// Usa a chave Service Role se existir, ou cai no fallback da Anon Key cadastrada
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -30,16 +32,16 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Alguns números escolhidos já não estão disponíveis.' });
     }
 
-    // 2. Definir o valor para TESTES (R$ 0,01 fixo por transação)
-    // Para voltar ao normal após os testes, substitua pela linha:
-    // const valorTotal = numeros.length * 10;
+    // 2. Definir o valor para TESTES (R$ 0,01 fixo)
     const valorTotal = 0.01;
 
     // 3. Criar Pagamento no Mercado Pago
+    const tokenMP = process.env.MP_ACCESS_TOKEN || process.env.MP_ACCESS_TOKEN_TEST;
+
     const mpResponse = await fetch('https://api.mercadopago.com/v1/payments', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.MP_ACCESS_TOKEN}`,
+        'Authorization': `Bearer ${tokenMP}`,
         'Content-Type': 'application/json',
         'X-Idempotency-Key': `pix-${Date.now()}-${Math.random()}`
       },
@@ -66,7 +68,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: paymentData.message || 'Erro ao gerar Pix no Mercado Pago.' });
     }
 
-    // 4. Reservar números no Supabase com o ID do pagamento Mercado Pago
+    // 4. Reservar números no Supabase
     const { error: updateError } = await supabase
       .from('cotas')
       .update({
@@ -81,7 +83,7 @@ export default async function handler(req, res) {
 
     if (updateError) throw updateError;
 
-    // 5. Retornar os dados do Pix para a página
+    // 5. Retornar dados do Pix
     return res.status(200).json({
       success: true,
       payment_id: paymentData.id,
