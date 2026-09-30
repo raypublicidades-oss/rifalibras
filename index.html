@@ -38,11 +38,11 @@
         <!-- CARD DO PRÊMIO E DETALHES -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col items-center justify-center text-center">
-                <div class="overflow-hidden rounded-xl w-full h-56 bg-slate-100 mb-3 flex items-center justify-center">
-                    <img src="cesta.jpg" alt="Cesta Natura com Ferrero Rocher" class="object-cover w-full h-full hover:scale-105 transition duration-300">
+                <div class="overflow-hidden rounded-xl w-full h-48 bg-slate-100 mb-3 flex items-center justify-center">
+                    <img src="cesta.jpg" alt="Cesta Natura" class="object-cover w-full h-full hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/300x300?text=Cesta+Natura'">
                 </div>
                 <span class="text-xs font-bold text-slate-500 uppercase tracking-wide">Prêmio Principal</span>
-                <span class="text-sm font-semibold text-slate-800">Cesta Natura Tododia + Ferrero Rocher</span>
+                <span class="text-sm font-semibold text-slate-800">Cesta Natura Completa</span>
             </div>
 
             <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -155,7 +155,7 @@
 
                     <div>
                         <label class="text-xs font-bold text-slate-700 block mb-1">Telefone / WhatsApp *</label>
-                        <input type="tel" id="telefone-comprador" required placeholder="(61) 98125-5187" class="w-full border border-slate-200 p-3 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-slate-50/50">
+                        <input type="tel" id="telefone-comprador" required placeholder="(61) 98123-4567" class="w-full border border-slate-200 p-3 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-slate-50/50">
                     </div>
 
                     <div class="text-center py-2">
@@ -165,11 +165,13 @@
 
                     <!-- BOTÕES DE OPÇÃO -->
                     <div class="space-y-2 pt-2">
+                        <!-- OPÇÃO 1: MERCADO PAGO AUTOMÁTICO -->
                         <button type="button" onclick="gerarPixMercadoPago()" id="btn-gerar" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-emerald-600/25 flex items-center justify-center space-x-2 transition active:scale-98">
                             <i class="fa-solid fa-qrcode text-lg"></i>
                             <span>Pagar com Pix Automático</span>
                         </button>
 
+                        <!-- OPÇÃO 2: MANUAL VIA WHATSAPP -->
                         <button type="button" onclick="enviarWhatsApp()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-green-500/25 flex items-center justify-center space-x-2 transition active:scale-98">
                             <i class="fa-brands fa-whatsapp text-xl"></i>
                             <span>Reservar e Enviar Comprovante</span>
@@ -221,7 +223,7 @@
 
         async function carregarCotas() {
             try {
-                await _supabase.rpc('expirar_cotas_pendentes');
+                await _supabase.rpc('limpar_reservas_expiradas');
             } catch (e) {}
 
             const { data, error } = await _supabase
@@ -259,7 +261,7 @@
                     btn.classList.add("num-pago");
                     btn.disabled = true;
                     btn.title = "Número vendido";
-                } else if (st === 'pendente') {
+                } else if (st === 'pendente' || st === 'reservado') {
                     btn.classList.add("num-pendente");
                     btn.disabled = true;
                     btn.title = "Aguardando confirmação do Pix";
@@ -314,6 +316,7 @@
             document.getElementById("modal-pagamento").classList.add("hidden");
         }
 
+        // OPÇÃO A: GERAR PIX AUTOMÁTICO (MERCADO PAGO)
         async function gerarPixMercadoPago() {
             const nome = document.getElementById("nome-comprador").value.trim();
             const email = document.getElementById("email-comprador").value.trim();
@@ -357,6 +360,7 @@
             }
         }
 
+        // OPÇÃO B: RESERVA MANUAL E ENVIO VIA WHATSAPP
         async function enviarWhatsApp() {
             const nome = document.getElementById("nome-comprador").value.trim();
             const email = document.getElementById("email-comprador").value.trim();
@@ -371,10 +375,9 @@
                 .from('cotas')
                 .update({ 
                     status: 'pendente',
-                    nome: nome,
-                    email: email || null,
-                    telefone: telefone || null,
-                    updated_at: new Date().toISOString()
+                    nome_comprador: nome,
+                    email_comprador: email || null,
+                    telefone_comprador: telefone || null
                 })
                 .in('numero', numerosSelecionados);
 
@@ -411,6 +414,7 @@
             alert("Código Pix copiado!");
         }
 
+        // Atualização em tempo real
         _supabase
             .channel('mudancas-cotas')
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'cotas' }, () => carregarCotas())
