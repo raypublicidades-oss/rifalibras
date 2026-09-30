@@ -38,11 +38,11 @@
         <!-- CARD DO PRÊMIO E DETALHES -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col items-center justify-center text-center">
-                <div class="overflow-hidden rounded-xl w-full h-48 bg-slate-100 mb-3 flex items-center justify-center">
-                    <img src="cesta.jpg" alt="Cesta Natura" class="object-cover w-full h-full hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/300x300?text=Cesta+Natura'">
+                <div class="overflow-hidden rounded-xl w-full h-56 bg-slate-100 mb-3 flex items-center justify-center">
+                    <img src="cesta.jpg" alt="Cesta Natura" class="object-cover w-full h-full hover:scale-105 transition duration-300">
                 </div>
                 <span class="text-xs font-bold text-slate-500 uppercase tracking-wide">Prêmio Principal</span>
-                <span class="text-sm font-semibold text-slate-800">Cesta Natura Completa</span>
+                <span class="text-sm font-semibold text-slate-800">Cesta Natura Tododia + Ferrero Rocher</span>
             </div>
 
             <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -68,7 +68,7 @@
 
                 <div class="sm:col-span-2 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 p-4 rounded-2xl flex items-center space-x-3 text-xs text-emerald-800">
                     <i class="fa-solid fa-circle-info text-emerald-600 text-lg shrink-0"></i>
-                    <span>Escolha seus números abaixo e finalize via Pix Automático ou reservando pelo WhatsApp!</span>
+                    <span>Escolha seus números abaixo e finalize via Pix Automático!</span>
                 </div>
             </div>
         </div>
@@ -130,26 +130,26 @@
         </div>
     </div>
 
-    <!-- MODAL DE OPÇÕES DE PAGAMENTO -->
+    <!-- MODAL DE PAGAMENTO PIX AUTOMÁTICO -->
     <div id="modal-pagamento" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative border border-slate-100 max-h-[90vh] overflow-y-auto">
             <button onclick="fecharModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full flex items-center justify-center bg-slate-100">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
-            <!-- ETAPA 1: DADOS DO COMPRADOR E ESCOLHA DE MÉTODO -->
+            <!-- ETAPA 1: DADOS DO COMPRADOR -->
             <div id="step-dados">
                 <h3 class="text-xl font-black text-slate-800 mb-1">Finalizar Reserva</h3>
-                <p class="text-xs text-slate-500 mb-5">Preencha seus dados para continuar.</p>
+                <p class="text-xs text-slate-500 mb-5">Preencha seus dados para gerar o Pix Automático.</p>
 
-                <form id="form-checkout" class="space-y-4">
+                <form id="form-checkout" onsubmit="event.preventDefault(); gerarPixMercadoPago();" class="space-y-4">
                     <div>
                         <label class="text-xs font-bold text-slate-700 block mb-1">Nome Completo *</label>
                         <input type="text" id="nome-comprador" required placeholder="Ex: Maria Silva" class="w-full border border-slate-200 p-3 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-slate-50/50">
                     </div>
 
                     <div>
-                        <label class="text-xs font-bold text-slate-700 block mb-1">E-mail <span class="text-slate-400 font-normal">(Obrigatório p/ Pix Automático)</span></label>
+                        <label class="text-xs font-bold text-slate-700 block mb-1">E-mail <span class="text-slate-400 font-normal">(opcional)</span></label>
                         <input type="email" id="email-comprador" placeholder="seuemail@exemplo.com" class="w-full border border-slate-200 p-3 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-slate-50/50">
                     </div>
 
@@ -163,24 +163,14 @@
                         <span id="modal-total" class="font-black text-2xl text-emerald-600">R$ 0,00</span>
                     </div>
 
-                    <!-- BOTÕES DE OPÇÃO -->
-                    <div class="space-y-2 pt-2">
-                        <!-- OPÇÃO 1: MERCADO PAGO AUTOMÁTICO -->
-                        <button type="button" onclick="gerarPixMercadoPago()" id="btn-gerar" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-emerald-600/25 flex items-center justify-center space-x-2 transition active:scale-98">
-                            <i class="fa-solid fa-qrcode text-lg"></i>
-                            <span>Pagar com Pix Automático</span>
-                        </button>
-
-                        <!-- OPÇÃO 2: MANUAL VIA WHATSAPP -->
-                        <button type="button" onclick="enviarWhatsApp()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-green-500/25 flex items-center justify-center space-x-2 transition active:scale-98">
-                            <i class="fa-brands fa-whatsapp text-xl"></i>
-                            <span>Reservar e Enviar Comprovante</span>
-                        </button>
-                    </div>
+                    <button type="submit" id="btn-gerar" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-emerald-600/25 flex items-center justify-center space-x-2 transition active:scale-98">
+                        <i class="fa-solid fa-qrcode text-lg"></i>
+                        <span>Gerar Pix Automático</span>
+                    </button>
                 </form>
             </div>
 
-            <!-- ETAPA 2: EXIBIÇÃO DO QR CODE DO MERCADO PAGO -->
+            <!-- ETAPA 2: EXIBIÇÃO DO QR CODE -->
             <div id="step-pix" class="hidden text-center space-y-4">
                 <h3 class="text-xl font-black text-slate-800">Pagamento Pix Automático</h3>
                 <p class="text-xs text-slate-500">Escaneie o QR Code ou copie a chave abaixo. O status muda assim que for pago!</p>
@@ -204,7 +194,6 @@
 
     <script>
         const CONFIG = {
-            whatsappNumero: "556198125187",
             totalCotas: 500,
             precoPorCota: 10.00
         };
@@ -223,7 +212,7 @@
 
         async function carregarCotas() {
             try {
-                await _supabase.rpc('limpar_reservas_expiradas');
+                await _supabase.rpc('expirar_cotas_pendentes');
             } catch (e) {}
 
             const { data, error } = await _supabase
@@ -261,7 +250,7 @@
                     btn.classList.add("num-pago");
                     btn.disabled = true;
                     btn.title = "Número vendido";
-                } else if (st === 'pendente' || st === 'reservado') {
+                } else if (st === 'pendente') {
                     btn.classList.add("num-pendente");
                     btn.disabled = true;
                     btn.title = "Aguardando confirmação do Pix";
@@ -316,14 +305,13 @@
             document.getElementById("modal-pagamento").classList.add("hidden");
         }
 
-        // OPÇÃO A: GERAR PIX AUTOMÁTICO (MERCADO PAGO)
         async function gerarPixMercadoPago() {
             const nome = document.getElementById("nome-comprador").value.trim();
             const email = document.getElementById("email-comprador").value.trim();
             const telefone = document.getElementById("telefone-comprador").value.trim();
 
-            if (!nome || !email || !telefone) {
-                alert("Por favor, preencha nome, e-mail e telefone para o Pix Automático.");
+            if (!nome || !telefone) {
+                alert("Por favor, preencha o Nome e o Telefone.");
                 return;
             }
 
@@ -356,55 +344,8 @@
                 alert(err.message);
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = `<i class="fa-solid fa-qrcode text-lg"></i><span>Pagar com Pix Automático</span>`;
+                btn.innerHTML = `<i class="fa-solid fa-qrcode text-lg"></i><span>Gerar Pix Automático</span>`;
             }
-        }
-
-        // OPÇÃO B: RESERVA MANUAL E ENVIO VIA WHATSAPP
-        async function enviarWhatsApp() {
-            const nome = document.getElementById("nome-comprador").value.trim();
-            const email = document.getElementById("email-comprador").value.trim();
-            const telefone = document.getElementById("telefone-comprador").value.trim();
-
-            if (!nome) {
-                alert("Por favor, preencha pelo menos o seu nome.");
-                return;
-            }
-
-            const { error } = await _supabase
-                .from('cotas')
-                .update({ 
-                    status: 'pendente',
-                    nome_comprador: nome,
-                    email_comprador: email || null,
-                    telefone_comprador: telefone || null
-                })
-                .in('numero', numerosSelecionados);
-
-            if (error) {
-                alert("Erro ao reservar os números. Tente novamente.");
-                console.error(error);
-                return;
-            }
-
-            const numerosFormatados = numerosSelecionados.map(n => String(n).padStart(3, '0')).sort((a,b)=>a-b).join(", ");
-            const total = (numerosSelecionados.length * CONFIG.precoPorCota).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
-            let texto = `*NOVA RESERVA DE RIFA!*\n\n`;
-            texto += `*Nome:* ${nome}\n`;
-            if (email) texto += `*E-mail:* ${email}\n`;
-            if (telefone) texto += `*Telefone:* ${telefone}\n`;
-            texto += `*Números Escolhidos:* ${numerosFormatados}\n`;
-            texto += `*Valor Total:* ${total}\n\n`;
-            texto += `Seguindo em anexo o comprovante do Pix para validação!`;
-
-            const linkWhatsApp = `https://wa.me/${CONFIG.whatsappNumero}?text=${encodeURIComponent(texto)}`;
-            
-            numerosSelecionados = [];
-            fecharModal();
-            carregarCotas();
-            atualizarInterface();
-            window.open(linkWhatsApp, '_blank');
         }
 
         function copiarPix() {
@@ -414,7 +355,6 @@
             alert("Código Pix copiado!");
         }
 
-        // Atualização em tempo real
         _supabase
             .channel('mudancas-cotas')
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'cotas' }, () => carregarCotas())
