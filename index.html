@@ -27,7 +27,7 @@
             </span>
             <h1 class="text-3xl sm:text-4xl font-black tracking-tight">Rifa Beneficente: Projeto de Libras no Chile</h1>
             <p class="text-emerald-100 text-sm sm:text-base max-w-2xl mx-auto font-normal leading-relaxed">
-                Apoie a apresentação do projeto de inclusão em Libras no Chile e concorra a uma linda <strong>Cesta Natura + Ferrero Rocher</strong>!
+                Apoie a apresentação do projeto de inclusão em Libras no Chile e concorra a uma linda <strong>Cesta Natura</strong>!
             </p>
         </div>
     </header>
@@ -155,7 +155,7 @@
 
                     <div>
                         <label class="text-xs font-bold text-slate-700 block mb-1">Telefone / WhatsApp *</label>
-                        <input type="tel" id="telefone-comprador" required placeholder="(61) 98123-4567" class="w-full border border-slate-200 p-3 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-slate-50/50">
+                        <input type="tel" id="telefone-comprador" required placeholder="(61) 98125-5187" class="w-full border border-slate-200 p-3 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-slate-50/50">
                     </div>
 
                     <div class="text-center py-2">
@@ -221,7 +221,7 @@
 
         async function carregarCotas() {
             try {
-                await _supabase.rpc('limpar_reservas_expiradas');
+                await _supabase.rpc('expirar_cotas_pendentes');
             } catch (e) {}
 
             const { data, error } = await _supabase
@@ -259,7 +259,7 @@
                     btn.classList.add("num-pago");
                     btn.disabled = true;
                     btn.title = "Número vendido";
-                } else if (st === 'pendente' || st === 'reservado') {
+                } else if (st === 'pendente') {
                     btn.classList.add("num-pendente");
                     btn.disabled = true;
                     btn.title = "Aguardando confirmação do Pix";
@@ -371,9 +371,10 @@
                 .from('cotas')
                 .update({ 
                     status: 'pendente',
-                    nome_comprador: nome,
-                    email_comprador: email || null,
-                    telefone_comprador: telefone || null
+                    nome: nome,
+                    email: email || null,
+                    telefone: telefone || null,
+                    updated_at: new Date().toISOString()
                 })
                 .in('numero', numerosSelecionados);
 
