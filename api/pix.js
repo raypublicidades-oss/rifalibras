@@ -17,15 +17,18 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Nenhum número selecionado.' });
     }
 
-    // 1. Verificar disponibilidade dos números
+    // 1. Libera cotas pendentes há mais de 30 minutos no banco
+    await supabase.rpc('expirar_cotas_pendentes');
+
+    // 2. Verifica se os números escolhidos estão disponíveis
     const { data: cotasExistentes, error: fetchError } = await supabase
       .from('cotas')
       .select('numero, status')
       .in('numero', numeros);
 
     if (fetchError) {
-      console.error('Erro ao buscar cotas:', fetchError);
-      throw new Error('Erro ao consultar cotas no banco.');
+      console.error('Erro Supabase Fetch:', fetchError);
+      throw new Error('Erro ao consultar banco de dados.');
     }
 
     const indisponiveis = cotasExistentes.filter(c => c.status !== 'disponivel');
@@ -33,10 +36,8 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Alguns números escolhidos já não estão disponíveis.' });
     }
 
-    // 2. Valor de teste: R$ 0,01 fixo
+    // 3. Configura o Mercado Pago (R$ 0,01 fixo para teste)
     const valorTotal = 0.01;
-
-    // 3. Token do Mercado Pago
     const tokenMP = process.env.MP_ACCESS_TOKEN || process.env.MP_ACCESS_TOKEN_TEST;
 
     if (!tokenMP) {
@@ -52,7 +53,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         transaction_amount: valorTotal,
-        description: `Rifa Libras - Cotas: ${numeros.join(', ')}`,
+        description: `Rifa - Cotas: ${numeros.join(', ')}`,
         payment_method_id: 'pix',
         payer: {
           email: email || 'cliente@exemplo.com',
@@ -73,28 +74,24 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: paymentData.message || 'Erro ao gerar Pix no Mercado Pago.' });
     }
 
-    // 4. Reservar números no Supabase
-    const payloadUpdate = {
-      status: 'pendente',
-      updated_at: new Date().toISOString()
-    };
-
-    if (nome) payloadUpdate.nome_comprador = nome;
-    if (email) payloadUpdate.email_comprador = email;
-    if (telefone) payloadUpdate.telefone_comprador = telefone;
-    if (paymentData.id) payloadUpdate.payment_id = String(paymentData.id);
-
+    // 4. Reservar números como 'pendente' e salvar nome, telefone, email e payment_id
     const { error: updateError } = await supabase
       .from('cotas')
-      .update(payloadUpdate)
+      .update({
+        status: 'pendente',
+        nome: nome || null,
+        telefone: telefone || null,
+        email: email || null,
+        payment_id: String(paymentData.id),
+        updated_at: new Date().toISOString()
+      })
       .in('numero', numeros);
 
     if (updateError) {
-      console.error('Erro ao atualizar cotas:', updateError);
+      console.error('Erro Supabase Update:', updateError);
       throw new Error('Erro ao reservar cotas no banco.');
     }
 
-    // 5. Retornar resposta com o QR Code Pix
     return res.status(200).json({
       success: true,
       payment_id: paymentData.id,
@@ -103,7 +100,7 @@ export default async function handler(req, res) {
     });
 
   } catch (err) {
-    console.error('Erro geral no Pix:', err);
+    console.error('Erro interno:', err);
     return res.status(500).json({ error: err.message || 'Erro interno no servidor.' });
   }
 }
