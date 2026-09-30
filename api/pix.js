@@ -1,8 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Mapeia para as variáveis que já estão configuradas na Vercel
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://swgdyqkiaxfovvsxfwav.supabase.co";
-// Usa a chave Service Role se existir, ou cai no fallback da Anon Key cadastrada
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -25,18 +23,25 @@ export default async function handler(req, res) {
       .select('numero, status')
       .in('numero', numeros);
 
-    if (fetchError) throw fetchError;
+    if (fetchError) {
+      console.error('Erro ao buscar cotas:', fetchError);
+      throw new Error('Erro ao consultar cotas no banco.');
+    }
 
     const indisponiveis = cotasExistentes.filter(c => c.status !== 'disponivel');
     if (indisponiveis.length > 0) {
       return res.status(400).json({ error: 'Alguns números escolhidos já não estão disponíveis.' });
     }
 
-    // 2. Definir o valor para TESTES (R$ 0,01 fixo)
+    // 2. Valor de teste: R$ 0,01 fixo
     const valorTotal = 0.01;
 
-    // 3. Criar Pagamento no Mercado Pago
+    // 3. Token do Mercado Pago
     const tokenMP = process.env.MP_ACCESS_TOKEN || process.env.MP_ACCESS_TOKEN_TEST;
+
+    if (!tokenMP) {
+      throw new Error('Token do Mercado Pago não configurado na Vercel.');
+    }
 
     const mpResponse = await fetch('https://api.mercadopago.com/v1/payments', {
       method: 'POST',
@@ -50,11 +55,11 @@ export default async function handler(req, res) {
         description: `Rifa Libras - Cotas: ${numeros.join(', ')}`,
         payment_method_id: 'pix',
         payer: {
-          email: email,
-          first_name: nome,
+          email: email || 'cliente@exemplo.com',
+          first_name: nome || 'Comprador',
           phone: {
-            area_code: telefone.replace(/\D/g, '').substring(0, 2) || '61',
-            number: telefone.replace(/\D/g, '').substring(2) || '999999999'
+            area_code: (telefone || '61999999999').replace(/\D/g, '').substring(0, 2) || '61',
+            number: (telefone || '61999999999').replace(/\D/g, '').substring(2) || '999999999'
           }
         },
         notification_url: 'https://rifalibras.vercel.app/api/webhook'
@@ -69,21 +74,27 @@ export default async function handler(req, res) {
     }
 
     // 4. Reservar números no Supabase
+    const payloadUpdate = {
+      status: 'pendente',
+      updated_at: new Date().toISOString()
+    };
+
+    if (nome) payloadUpdate.nome_comprador = nome;
+    if (email) payloadUpdate.email_comprador = email;
+    if (telefone) payloadUpdate.telefone_comprador = telefone;
+    if (paymentData.id) payloadUpdate.payment_id = String(paymentData.id);
+
     const { error: updateError } = await supabase
       .from('cotas')
-      .update({
-        status: 'pendente',
-        nome_comprador: nome,
-        email_comprador: email,
-        telefone_comprador: telefone,
-        payment_id: String(paymentData.id),
-        updated_at: new Date().toISOString()
-      })
+      .update(payloadUpdate)
       .in('numero', numeros);
 
-    if (updateError) throw updateError;
+    if (updateError) {
+      console.error('Erro ao atualizar cotas:', updateError);
+      throw new Error('Erro ao reservar cotas no banco.');
+    }
 
-    // 5. Retornar dados do Pix
+    // 5. Retornar resposta com o QR Code Pix
     return res.status(200).json({
       success: true,
       payment_id: paymentData.id,
