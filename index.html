@@ -73,6 +73,40 @@
             </div>
         </div>
 
+        <!-- BARRA DE PROGRESSO DE VENDAS -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 space-y-3">
+            <div class="flex items-center justify-between text-xs sm:text-sm">
+                <div class="font-bold text-slate-700 flex items-center space-x-2">
+                    <i class="fa-solid fa-chart-line text-emerald-600"></i>
+                    <span>Progresso de Vendas</span>
+                </div>
+                <div class="font-black text-emerald-600">
+                    <span id="pct-vendidos">0%</span> vendido
+                </div>
+            </div>
+
+            <!-- Trilho da Barra de Progresso -->
+            <div class="w-full bg-slate-100 h-3.5 rounded-full overflow-hidden p-0.5 border border-slate-200/60">
+                <div id="barra-progresso" class="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full transition-all duration-500 ease-out w-0"></div>
+            </div>
+
+            <!-- Resumo das Cotas -->
+            <div class="grid grid-cols-3 text-center pt-1 border-t border-slate-100 text-xs">
+                <div>
+                    <span class="text-slate-400 block font-semibold">Vendidos</span>
+                    <strong id="num-vendidos" class="text-emerald-600 font-bold text-sm sm:text-base">0</strong>
+                </div>
+                <div>
+                    <span class="text-slate-400 block font-semibold">Disponíveis</span>
+                    <strong id="num-disponiveis" class="text-slate-700 font-bold text-sm sm:text-base">500</strong>
+                </div>
+                <div>
+                    <span class="text-slate-400 block font-semibold">Total</span>
+                    <strong class="text-slate-700 font-bold text-sm sm:text-base">500</strong>
+                </div>
+            </div>
+        </div>
+
         <!-- LEGENDA -->
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center space-x-4 text-xs font-semibold">
@@ -217,7 +251,8 @@
 
             const { data, error } = await _supabase
                 .from('cotas')
-                .select('numero, status');
+                .select('numero, status')
+                .limit(CONFIG.totalCotas);
 
             if (error) {
                 console.error("Erro ao carregar do Supabase:", error);
@@ -231,7 +266,26 @@
                 });
             }
 
+            atualizarBarraProgresso();
             gerarGrid();
+        }
+
+        function atualizarBarraProgresso() {
+            let vendidos = 0;
+            
+            Object.values(dadosCotas).forEach(status => {
+                if (status === 'pago' || status === 'pendente') {
+                    vendidos++;
+                }
+            });
+
+            const disponiveis = CONFIG.totalCotas - vendidos;
+            const porcentagem = Math.round((vendidos / CONFIG.totalCotas) * 100);
+
+            document.getElementById("num-vendidos").innerText = vendidos;
+            document.getElementById("num-disponiveis").innerText = disponiveis;
+            document.getElementById("pct-vendidos").innerText = `${porcentagem}%`;
+            document.getElementById("barra-progresso").style.width = `${porcentagem}%`;
         }
 
         function gerarGrid() {
