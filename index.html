@@ -20,73 +20,100 @@
 <body class="bg-slate-50 text-gray-800 font-sans min-h-screen flex flex-col antialiased">
 
     <!-- CABEÇALHO -->
-    <header class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-700 text-white py-10 px-4 shadow-lg">
-        <div class="max-w-4xl mx-auto text-center space-y-3">
-            <span class="inline-block bg-emerald-950/40 text-emerald-200 text-xs font-semibold px-4 py-1.5 rounded-full uppercase tracking-wider backdrop-blur-sm border border-emerald-500/20">
+    <header class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-700 text-white py-8 px-4 shadow-lg">
+        <div class="max-w-4xl mx-auto text-center space-y-2">
+            <span class="inline-block bg-emerald-950/40 text-emerald-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider border border-emerald-500/20">
                 Ação Solidária
             </span>
-            <h1 class="text-3xl sm:text-4xl font-black tracking-tight">Rifa Beneficente: Projeto de Libras no Chile</h1>
-            <p class="text-emerald-100 text-sm sm:text-base max-w-2xl mx-auto font-normal leading-relaxed">
-                Apoie a apresentação do projeto de Libras no Chile e concorra a uma linda <strong>Cesta Natura</strong>!
+            <h1 class="text-2xl sm:text-3xl font-black tracking-tight">Rifa Beneficente: LIBRAS no Chile</h1>
+            <p class="text-emerald-100 text-xs sm:text-sm max-w-xl mx-auto font-normal">
+                Apoie a apresentação do projeto acadêmico de Libras no XXIX Congresso Internacional de Humanidades no Chile e concorra a uma Cesta Natura!
             </p>
         </div>
     </header>
 
     <!-- CONTEÚDO PRINCIPAL -->
-    <main class="max-w-4xl mx-auto px-4 py-8 flex-grow w-full space-y-6">
+    <main class="max-w-4xl mx-auto px-4 py-6 flex-grow w-full space-y-5">
+
+        <!-- CARD SOBRE A APRESENTAÇÃO E OBJETIVO DA VIAGEM -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 space-y-3">
+            <div class="flex items-center space-x-2 text-emerald-700 font-bold text-sm border-b border-slate-100 pb-2">
+                <i class="fa-solid fa-earth-americas text-emerald-600"></i>
+                <h2>Sobre o Projeto e a Viagem</h2>
+            </div>
+            
+            <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
+                Esta ação solidária foi criada por nós, alunos de Libras, para viabilizar a participação e apresentação de um trabalho científico no <strong>XXIX Congresso Internacional de Humanidades</strong>, realizado em Santiago, no Chile, durante o mês de Outubro.
+            </p>
+            <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
+                Toda a arrecadação desta rifa será destinada ao custeio de passagens e hospedagem para garantir a representação do nosso projeto de inclusão no evento internacional.
+            </p>
+        </div>
+
+        <!-- CARD DE DATA DE ENCERRAMENTO E COMPARTILHAMENTO -->
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
+            <div class="flex items-center space-x-2 text-slate-700 font-medium">
+                <i class="fa-solid fa-calendar-day text-amber-500 text-base"></i>
+                <span>Data de encerramento da rifa: <strong class="text-slate-900">08/10/2026</strong></span>
+            </div>
+            <a href="https://api.whatsapp.com/send?text=Oi!%20%F0%9F%98%81%20Criamos%20uma%20rifa%20solid%C3%A1ria%20para%20apoiar%20a%20apresenta%C3%A7%C3%A3o%20de%20um%20projeto%20de%20Libras%20no%20XXIX%20Congresso%20Internacional%20de%20Humanidades%20no%20Chile!%20Concorra%20a%20uma%20Cesta%20Natura:%20https://rifalibras.vercel.app" target="_blank" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-3 py-1.5 rounded-xl flex items-center space-x-1.5 transition">
+                <i class="fa-brands fa-whatsapp text-sm text-emerald-600"></i>
+                <span>Compartilhar</span>
+            </a>
+        </div>
         
         <!-- CARD DO PRÊMIO E DETALHES -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col items-center justify-center text-center">
-                <div class="overflow-hidden rounded-xl w-full h-56 bg-slate-100 mb-3 flex items-center justify-center">
+                <div class="overflow-hidden rounded-xl w-full h-44 bg-slate-100 mb-2 flex items-center justify-center">
                     <img src="cesta.jpg" alt="Cesta Natura" class="object-cover w-full h-full hover:scale-105 transition duration-300">
                 </div>
-                <span class="text-xs font-bold text-slate-500 uppercase tracking-wide">Prêmio Principal</span>
-                <span class="text-sm font-semibold text-slate-800">Cesta Natura e Ferrero Rocher</span>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Prêmio Principal</span>
+                <span class="text-sm font-semibold text-slate-800">Cesta Exclusiva Natura</span>
             </div>
 
-            <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center space-x-4">
-                    <div class="bg-emerald-100 text-emerald-600 w-12 h-12 rounded-xl flex items-center justify-center text-xl shrink-0">
+            <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex items-center space-x-3">
+                    <div class="bg-emerald-100 text-emerald-600 w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0">
                         <i class="fa-solid fa-ticket"></i>
                     </div>
                     <div>
-                        <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Valor por Número</div>
-                        <div class="text-2xl font-black text-emerald-600">R$ 10,00</div>
+                        <div class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Valor por Cota</div>
+                        <div class="text-xl font-black text-emerald-600">R$ 10,00</div>
                     </div>
                 </div>
 
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center space-x-4">
-                    <div class="bg-sky-100 text-sky-600 w-12 h-12 rounded-xl flex items-center justify-center text-xl shrink-0">
-                        <i class="fa-solid fa-plane-departure"></i>
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex items-center space-x-3">
+                    <div class="bg-sky-100 text-sky-600 w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0">
+                        <i class="fa-solid fa-graduation-cap"></i>
                     </div>
                     <div>
-                        <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Objetivo</div>
-                        <div class="text-base font-bold text-slate-700">Projeto no Chile</div>
+                        <div class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Evento</div>
+                        <div class="text-xs font-bold text-slate-700">XXIX Congresso de Humanidades</div>
                     </div>
                 </div>
 
-                <div class="sm:col-span-2 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 p-4 rounded-2xl flex items-center space-x-3 text-xs text-emerald-800">
-                    <i class="fa-solid fa-circle-info text-emerald-600 text-lg shrink-0"></i>
-                    <span>Escolha seus números abaixo e finalize via Pix Automático!</span>
+                <div class="sm:col-span-2 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 p-3 rounded-2xl flex items-center space-x-3 text-xs text-emerald-800">
+                    <i class="fa-solid fa-circle-info text-emerald-600 text-base shrink-0"></i>
+                    <span>Escolha os números na grade abaixo e pague via **Pix Automático**.</span>
                 </div>
             </div>
         </div>
 
         <!-- BARRA DE PROGRESSO DE VENDAS -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 space-y-3">
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 space-y-2.5">
             <div class="flex items-center justify-between text-xs sm:text-sm">
                 <div class="font-bold text-slate-700 flex items-center space-x-2">
                     <i class="fa-solid fa-chart-line text-emerald-600"></i>
-                    <span>Progresso de Vendas</span>
+                    <span>Progresso do Projeto</span>
                 </div>
                 <div class="font-black text-emerald-600">
-                    <span id="pct-vendidos">0%</span> vendido
+                    <span id="pct-vendidos">0%</span> arrecadado
                 </div>
             </div>
 
             <!-- Trilho da Barra de Progresso -->
-            <div class="w-full bg-slate-100 h-3.5 rounded-full overflow-hidden p-0.5 border border-slate-200/60">
+            <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden border border-slate-200/60">
                 <div id="barra-progresso" class="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full transition-all duration-500 ease-out w-0"></div>
             </div>
 
@@ -94,47 +121,44 @@
             <div class="grid grid-cols-3 text-center pt-1 border-t border-slate-100 text-xs">
                 <div>
                     <span class="text-slate-400 block font-semibold">Vendidos</span>
-                    <strong id="num-vendidos" class="text-emerald-600 font-bold text-sm sm:text-base">0</strong>
+                    <strong id="num-vendidos" class="text-emerald-600 font-bold text-sm">0</strong>
                 </div>
                 <div>
                     <span class="text-slate-400 block font-semibold">Disponíveis</span>
-                    <strong id="num-disponiveis" class="text-slate-700 font-bold text-sm sm:text-base">500</strong>
+                    <strong id="num-disponiveis" class="text-slate-700 font-bold text-sm">500</strong>
                 </div>
                 <div>
                     <span class="text-slate-400 block font-semibold">Total</span>
-                    <strong class="text-slate-700 font-bold text-sm sm:text-base">500</strong>
+                    <strong class="text-slate-700 font-bold text-sm">500</strong>
                 </div>
             </div>
         </div>
 
         <!-- LEGENDA -->
-        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center space-x-4 text-xs font-semibold">
-                <div class="flex items-center space-x-1.5">
-                    <span class="w-3 h-3 bg-white border border-slate-300 rounded-full inline-block"></span>
+        <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200/80 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div class="flex items-center space-x-3 font-semibold">
+                <div class="flex items-center space-x-1">
+                    <span class="w-2.5 h-2.5 bg-white border border-slate-300 rounded-full inline-block"></span>
                     <span class="text-slate-600">Livre</span>
                 </div>
-                <div class="flex items-center space-x-1.5">
-                    <span class="w-3 h-3 bg-amber-500 rounded-full inline-block"></span>
+                <div class="flex items-center space-x-1">
+                    <span class="w-2.5 h-2.5 bg-amber-500 rounded-full inline-block"></span>
                     <span class="text-slate-600">Selecionado</span>
                 </div>
-                <div class="flex items-center space-x-1.5">
-                    <span class="w-3 h-3 bg-orange-500 rounded-full inline-block"></span>
-                    <span class="text-slate-600">Aguardando Pix</span>
+                <div class="flex items-center space-x-1">
+                    <span class="w-2.5 h-2.5 bg-orange-500 rounded-full inline-block"></span>
+                    <span class="text-slate-600">Aguardando</span>
                 </div>
-                <div class="flex items-center space-x-1.5">
-                    <span class="w-3 h-3 bg-emerald-500 rounded-full inline-block"></span>
-                    <span class="text-slate-600">Vendido / Pago</span>
+                <div class="flex items-center space-x-1">
+                    <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full inline-block"></span>
+                    <span class="text-slate-600">Vendido</span>
                 </div>
-            </div>
-            <div class="text-xs text-slate-400 font-medium">
-                Total: <strong class="text-slate-700">500 cotas</strong>
             </div>
         </div>
 
         <!-- GRADE DE NÚMEROS -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80">
-            <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4 flex items-center justify-between">
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
+            <h2 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3 flex items-center justify-between">
                 <span>Escolha seus números:</span>
                 <i class="fa-solid fa-arrow-pointer text-slate-400"></i>
             </h2>
