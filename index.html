@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rifa Solidária - Projeto de LIBRAS no Chile</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Importação do Supabase JS v2 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         .num-btn { transition: all 0.15s ease-in-out; }
@@ -15,18 +16,32 @@
         .num-selecionado { background-color: #f59e0b; color: #ffffff; border: 1px solid #d97706; font-weight: bold; box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.3); }
         .num-pendente { background-color: #f97316; color: #ffffff; border: 1px solid #ea580c; cursor: not-allowed; opacity: 0.85; }
         .num-pago { background-color: #10b981; color: #ffffff; border: 1px solid #059669; cursor: not-allowed; }
+
+        /* HEADER TEMÁTICO DE LIBRAS COM OVERLAY VERDE */
+        .bg-header-libras {
+            background: linear-gradient(135deg, rgba(6, 78, 59, 0.92), rgba(15, 118, 110, 0.90)), 
+                        url('fundo-libras.png') center/cover no-repeat;
+        }
+
+        /* FUNDO DE PÁGINA SUAVE */
+        body {
+            background-color: #f8fafc;
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-gray-800 font-sans min-h-screen flex flex-col antialiased">
+<body class="text-gray-800 font-sans min-h-screen flex flex-col antialiased">
 
-    <!-- CABEÇALHO -->
-    <header class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-700 text-white py-8 px-4 shadow-lg">
-        <div class="max-w-4xl mx-auto text-center space-y-2">
-            <span class="inline-block bg-emerald-950/40 text-emerald-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider border border-emerald-500/20">
-                Ação Solidária
-            </span>
-            <h1 class="text-2xl sm:text-3xl font-black tracking-tight">Rifa Beneficente: LIBRAS no Chile</h1>
-            <p class="text-emerald-100 text-xs sm:text-sm max-w-xl mx-auto font-normal">
+    <!-- CABEÇALHO TEMÁTICO -->
+    <header class="bg-header-libras text-white py-10 px-4 shadow-xl border-b-4 border-emerald-500">
+        <div class="max-w-4xl mx-auto text-center space-y-3">
+            <div class="inline-flex items-center space-x-2 bg-emerald-950/50 text-emerald-200 text-xs font-semibold px-3.5 py-1.5 rounded-full uppercase tracking-wider border border-emerald-400/30 backdrop-blur-sm">
+                <i class="fa-solid fa-hands-holding-circle text-emerald-300"></i>
+                <span>Ação Solidária de LIBRAS</span>
+            </div>
+            <h1 class="text-2xl sm:text-4xl font-black tracking-tight drop-shadow-md">Rifa Beneficente: LIBRAS no Chile</h1>
+            <p class="text-emerald-100 text-xs sm:text-sm max-w-xl mx-auto font-normal leading-relaxed">
                 Apoie a apresentação do projeto acadêmico de Libras no XXIX Congresso Internacional de Humanidades no Chile e concorra a uma Cesta Natura!
             </p>
         </div>
@@ -54,19 +69,19 @@
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
             <div class="flex items-center space-x-2 text-slate-700 font-medium">
                 <i class="fa-solid fa-calendar-day text-amber-500 text-base"></i>
-                <span>Data de encerramento da rifa: <strong class="text-slate-900">08/10/2026</strong></span>
+                <span>Data de encerramento da Rifa: <strong class="text-slate-900">08/10/2026</strong></span>
             </div>
-            <a href="https://api.whatsapp.com/send?text=Oi!%20%F0%9F%98%81%20Criamos%20uma%20rifa%20solid%C3%A1ria%20para%20apoiar%20a%20apresenta%C3%A7%C3%A3o%20de%20um%20projeto%20de%20Libras%20no%20XXIX%20Congresso%20Internacional%20de%20Humanidades%20no%20Chile!%20Concorra%20a%20uma%20Cesta%20Natura:%20https://rifalibras.vercel.app" target="_blank" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-3 py-1.5 rounded-xl flex items-center space-x-1.5 transition">
+            <button onclick="compartilharWhatsApp()" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-3 py-1.5 rounded-xl flex items-center space-x-1.5 transition">
                 <i class="fa-brands fa-whatsapp text-sm text-emerald-600"></i>
                 <span>Compartilhar</span>
-            </a>
+            </button>
         </div>
         
         <!-- CARD DO PRÊMIO E DETALHES -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col items-center justify-center text-center">
                 <div class="overflow-hidden rounded-xl w-full h-44 bg-slate-100 mb-2 flex items-center justify-center">
-                    <img src="cesta.jpg" alt="Cesta Natura" class="object-cover w-full h-full hover:scale-105 transition duration-300">
+                    <img src="cesta.jpg" alt="Cesta Natura" class="object-cover w-full h-full hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/300x200?text=Cesta+Natura'">
                 </div>
                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Prêmio Principal</span>
                 <span class="text-sm font-semibold text-slate-800">Cesta Exclusiva Natura</span>
@@ -169,7 +184,7 @@
     </main>
 
     <!-- BARRA FIXA DE CHECKOUT -->
-    <div id="checkout-bar" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 p-4 shadow-2xl transition-all duration-300 translate-y-full hidden z-40">
+    <div id="checkout-bar" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 p-4 shadow-2xl transition-all duration-300 translate-y-full z-40">
         <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
                 <span class="text-xs text-slate-400 block font-semibold">Números selecionados:</span>
@@ -259,7 +274,8 @@
         const SUPABASE_URL = "https://swgdyqkiaxfovvsxfwav.supabase.co"; 
         const SUPABASE_KEY = "sb_publishable_SGisG1eE-Ua5iqXUHhX11A_tQ0xeLHs";
         
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // Inicialização do cliente Supabase v2
+        const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
         let dadosCotas = {};
         let numerosSelecionados = [];
@@ -269,11 +285,16 @@
         });
 
         async function carregarCotas() {
+            if (!supabaseClient) {
+                console.error("Supabase não foi carregado corretamente.");
+                return;
+            }
+
             try {
-                await _supabase.rpc('expirar_cotas_pendentes');
+                await supabaseClient.rpc('expirar_cotas_pendentes');
             } catch (e) {}
 
-            const { data, error } = await _supabase
+            const { data, error } = await supabaseClient
                 .from('cotas')
                 .select('numero, status')
                 .limit(CONFIG.totalCotas);
@@ -358,7 +379,7 @@
             gerarGrid();
             const bar = document.getElementById("checkout-bar");
             if (numerosSelecionados.length > 0) {
-                bar.classList.remove("hidden", "translate-y-full");
+                bar.classList.remove("translate-y-full");
                 const numerosFormatados = numerosSelecionados.map(n => String(n).padStart(3, '0')).sort((a,b)=>a-b).join(", ");
                 document.getElementById("resumo-numeros").innerText = numerosFormatados;
                 
@@ -369,7 +390,6 @@
                 document.getElementById("modal-total").innerText = totalFormatado;
             } else {
                 bar.classList.add("translate-y-full");
-                setTimeout(() => bar.classList.add("hidden"), 300);
             }
         }
 
@@ -381,6 +401,12 @@
 
         function fecharModal() {
             document.getElementById("modal-pagamento").classList.add("hidden");
+        }
+
+        function compartilharWhatsApp() {
+            const texto = "Oi! Criamos uma rifa solidária para apoiar a apresentação de um projeto de Libras no XXIX Congresso Internacional de Humanidades no Chile! Concorra a uma Cesta Natura: https://rifalibras.vercel.app";
+            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
+            window.open(url, '_blank');
         }
 
         async function gerarPixMercadoPago() {
@@ -433,10 +459,12 @@
             alert("Código Pix copiado!");
         }
 
-        _supabase
-            .channel('mudancas-cotas')
-            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'cotas' }, () => carregarCotas())
-            .subscribe();
+        if (supabaseClient) {
+            supabaseClient
+                .channel('mudancas-cotas')
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'cotas' }, () => carregarCotas())
+                .subscribe();
+        }
     </script>
 </body>
 </html>
