@@ -171,12 +171,32 @@
             </div>
         </div>
 
-        <!-- GRADE DE NÚMEROS -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
-            <h2 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3 flex items-center justify-between">
-                <span>Escolha seus números:</span>
-                <i class="fa-solid fa-arrow-pointer text-slate-400"></i>
-            </h2>
+        <!-- GRADE DE NÚMEROS E BARRINHA DE PESQUISA -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <h2 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center space-x-1.5">
+                    <i class="fa-solid fa-arrow-pointer text-slate-400"></i>
+                    <span>Escolha seus números:</span>
+                </h2>
+
+                <!-- BARRA DE PESQUISA E FILTROS -->
+                <div class="flex items-center space-x-2">
+                    <div class="relative w-full sm:w-48">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input type="number" id="input-busca" oninput="filtrarNumeros()" placeholder="Buscar número..." 
+                            class="w-full pl-8 pr-7 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        <button id="btn-limpar-busca" onclick="limparBusca()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <button id="btn-apenas-livres" onclick="alternarFiltroLivres()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-1.5 rounded-xl border border-slate-200/80 transition shrink-0 flex items-center space-x-1">
+                        <i class="fa-solid fa-filter text-[10px] text-slate-400"></i>
+                        <span>Apenas Livres</span>
+                    </button>
+                </div>
+            </div>
+
             <div id="grid-numeros" class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2 max-h-[420px] overflow-y-auto p-1">
                 <p class="text-center text-sm text-slate-400 col-span-full py-8">Carregando cotas...</p>
             </div>
@@ -279,6 +299,7 @@
 
         let dadosCotas = {};
         let numerosSelecionados = [];
+        let filtroApenasLivres = false;
 
         document.addEventListener("DOMContentLoaded", () => {
             carregarCotas();
@@ -335,13 +356,28 @@
 
         function gerarGrid() {
             const grid = document.getElementById("grid-numeros");
+            const termoBusca = document.getElementById("input-busca").value.trim();
             grid.innerHTML = "";
 
+            let encontrados = 0;
+
             for (let i = 1; i <= CONFIG.totalCotas; i++) {
-                const btn = document.createElement("button");
                 const numeroFormatado = String(i).padStart(3, '0');
                 const st = dadosCotas[i] || 'disponivel';
 
+                // Aplicação do Filtro de Pesquisa por texto
+                if (termoBusca && !numeroFormatado.includes(termoBusca) && !String(i).includes(termoBusca)) {
+                    continue;
+                }
+
+                // Aplicação do Filtro de Apenas Livres
+                if (filtroApenasLivres && (st === 'pago' || st === 'pendente')) {
+                    continue;
+                }
+
+                encontrados++;
+
+                const btn = document.createElement("button");
                 btn.innerText = numeroFormatado;
                 btn.className = "num-btn py-2.5 text-xs font-semibold rounded-xl transition-all text-center shadow-sm";
 
@@ -363,6 +399,42 @@
 
                 grid.appendChild(btn);
             }
+
+            if (encontrados === 0) {
+                grid.innerHTML = `<p class="text-center text-xs text-slate-400 col-span-full py-8">Nenhum número encontrado para a sua pesquisa.</p>`;
+            }
+        }
+
+        function filtrarNumeros() {
+            const val = document.getElementById("input-busca").value;
+            const btnLimpar = document.getElementById("btn-limpar-busca");
+            
+            if (val.length > 0) {
+                btnLimpar.classList.remove("hidden");
+            } else {
+                btnLimpar.classList.add("hidden");
+            }
+            gerarGrid();
+        }
+
+        function limparBusca() {
+            document.getElementById("input-busca").value = "";
+            document.getElementById("btn-limpar-busca").classList.add("hidden");
+            gerarGrid();
+        }
+
+        function alternarFiltroLivres() {
+            filtroApenasLivres = !filtroApenasLivres;
+            const btn = document.getElementById("btn-apenas-livres");
+            
+            if (filtroApenasLivres) {
+                btn.classList.remove("bg-slate-100", "text-slate-700");
+                btn.classList.add("bg-emerald-600", "text-white", "border-emerald-600");
+            } else {
+                btn.classList.remove("bg-emerald-600", "text-white", "border-emerald-600");
+                btn.classList.add("bg-slate-100", "text-slate-700");
+            }
+            gerarGrid();
         }
 
         function alternarNumero(num) {
