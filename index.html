@@ -13,6 +13,7 @@
         .num-disponivel { background-color: #ffffff; color: #374151; border: 1px solid #e5e7eb; cursor: default; }
         .num-pendente { background-color: #f97316; color: #ffffff; border: 1px solid #ea580c; cursor: not-allowed; opacity: 0.85; }
         .num-pago { background-color: #10b981; color: #ffffff; border: 1px solid #059669; cursor: not-allowed; }
+        .num-vencedor { background-color: #f59e0b !important; color: #ffffff !important; border: 2px solid #d97706 !important; font-weight: bold; transform: scale(1.1); box-shadow: 0 0 12px rgba(245, 158, 11, 0.6); }
 
         /* BLOQUEIO TOTAL DE SELEÇÃO */
         .vendas-encerradas .num-disponivel {
@@ -45,7 +46,7 @@
             </div>
             <h1 class="text-2xl sm:text-4xl font-black tracking-tight drop-shadow-md">Rifa Beneficente: LIBRAS no Chile</h1>
             <p class="text-emerald-100 text-xs sm:text-sm max-w-xl mx-auto font-normal leading-relaxed">
-                Apoie a apresentação do projeto acadêmico de Libras no XXIX Congresso Internacional de Humanidades no Chile e concorra a uma Cesta Natura!
+                Resultado Oficial do Sorteio da Cesta Natura!
             </p>
         </div>
     </header>
@@ -53,16 +54,46 @@
     <!-- CONTEÚDO PRINCIPAL -->
     <main class="max-w-4xl mx-auto px-4 py-6 flex-grow w-full space-y-5">
 
-        <!-- BANNER DE RIFA ENCERRADA / RESULTADO EM BREVE -->
-        <div class="bg-gradient-to-r from-amber-500 to-amber-600 text-white p-5 rounded-2xl shadow-lg border border-amber-400/30 text-center space-y-2">
-            <div class="inline-flex items-center space-x-2 bg-amber-950/40 text-amber-100 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-amber-300/30 backdrop-blur-sm">
-                <i class="fa-solid fa-lock"></i>
-                <span>Vendas Encerradas</span>
+        <!-- CARD DO GANHADOR (DESTAQUE) -->
+        <div class="bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-500 text-white p-6 rounded-3xl shadow-xl border border-amber-300/40 text-center space-y-3 relative overflow-hidden">
+            <div class="inline-flex items-center space-x-2 bg-amber-950/40 text-amber-100 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-amber-200/30 backdrop-blur-sm">
+                <i class="fa-solid fa-trophy text-amber-300"></i>
+                <span>Sorteio Realizado</span>
             </div>
-            <h2 class="text-xl sm:text-2xl font-black tracking-tight">Rifa Encerrada!</h2>
-            <p class="text-xs sm:text-sm font-medium text-amber-50 max-w-xl mx-auto leading-relaxed">
-                Agradecemos imensamente a todos que contribuíram adquirindo suas cotas! As vendas foram oficialmente encerradas e em breve o resultado do sorteio da <strong>Cesta Natura</strong> será divulgado por aqui.
+            
+            <h2 class="text-2xl sm:text-3xl font-black tracking-tight">Temos o Número Vencedor!</h2>
+            
+            <!-- EXIBIÇÃO DO NÚMERO GANHADOR -->
+            <div class="py-2">
+                <span class="text-xs text-amber-100 uppercase tracking-widest font-semibold block">Número Sorteado</span>
+                <div class="inline-block bg-white text-amber-600 font-black text-4xl sm:text-5xl px-8 py-3 rounded-2xl shadow-lg border-2 border-amber-300 my-1">
+                    114
+                </div>
+            </div>
+
+            <p class="text-xs sm:text-sm font-medium text-amber-50 max-w-lg mx-auto leading-relaxed">
+                Parabéns ao ganhador do número <strong>114</strong>! Entraremos em contato para organizar a entrega da <strong>Cesta Natura</strong>. Agradecemos imensamente a todos que contribuíram com o nosso projeto!
             </p>
+        </div>
+
+        <!-- SEÇÃO DO VÍDEO DO SORTEIO -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 space-y-3">
+            <div class="flex items-center space-x-2 text-emerald-700 font-bold text-sm border-b border-slate-100 pb-2">
+                <i class="fa-solid fa-video text-emerald-600"></i>
+                <h2>Confira a Gravação do Sorteio</h2>
+            </div>
+
+            <!-- PLAYER DE VÍDEO -->
+            <div class="aspect-video w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-200 shadow-inner flex items-center justify-center">
+                <!-- OPÇÃO A: Se você subiu o vídeo para o YouTube (substitua SEU_ID_DO_VIDEO pelo ID do YouTube) -->
+                <!-- <iframe class="w-full h-full" src="https://www.youtube.com/embed/SEU_ID_DO_VIDEO" title="Vídeo do Sorteio" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
+
+                <!-- OPÇÃO B: Se você tem o arquivo MP4 na mesma pasta do projeto (ex: sorteio.mp4) -->
+                <video class="w-full h-full object-cover" controls poster="cesta.jpg">
+                    <source src="sorteio.mp4" type="video/mp4">
+                    Seu navegador não suporta a exibição de vídeos HTML5.
+                </video>
+            </div>
         </div>
 
         <!-- CARD SOBRE A APRESENTAÇÃO E OBJETIVO DA VIAGEM -->
@@ -76,7 +107,7 @@
                 Esta ação solidária foi criada por nós, alunos de Libras, para viabilizar a participação e apresentação de um trabalho científico no <strong>XXIX Congresso Internacional de Humanidades</strong>, realizado em Santiago, no Chile, durante o mês de Outubro.
             </p>
             <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
-                Toda a arrecadação desta rifa será destinada ao custeio de passagens e hospedagem para garantir a representação do nosso projeto de inclusão no evento internacional.
+                Toda a arrecadação desta rifa foi destinada ao custeio de passagens e hospedagem para garantir a representação do nosso projeto de inclusão no evento internacional.
             </p>
         </div>
 
@@ -84,11 +115,11 @@
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
             <div class="flex items-center space-x-2 text-slate-700 font-medium">
                 <i class="fa-solid fa-flag-checkered text-amber-500 text-base"></i>
-                <span>Encerramento: <strong class="text-slate-900">20/10/2026 (Resultado em Breve!)</strong></span>
+                <span>Status da Rifa: <strong class="text-slate-900">Sorteio Finalizado</strong></span>
             </div>
             <button onclick="compartilharWhatsApp()" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-3 py-1.5 rounded-xl flex items-center space-x-1.5 transition">
                 <i class="fa-brands fa-whatsapp text-sm text-emerald-600"></i>
-                <span>Compartilhar Página</span>
+                <span>Compartilhar Resultado</span>
             </button>
         </div>
         
@@ -98,7 +129,7 @@
                 <div class="overflow-hidden rounded-xl w-full h-44 bg-slate-100 mb-2 flex items-center justify-center">
                     <img src="cesta.jpg" alt="Cesta Natura" class="object-cover w-full h-full hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/300x200?text=Cesta+Natura'">
                 </div>
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Prêmio Principal</span>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Prêmio Sorteado</span>
                 <span class="text-sm font-semibold text-slate-800">Cesta Exclusiva Natura</span>
             </div>
 
@@ -108,7 +139,7 @@
                         <i class="fa-solid fa-ticket"></i>
                     </div>
                     <div>
-                        <div class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Valor por Cota</div>
+                        <div class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Valor da Cota</div>
                         <div class="text-xl font-black text-emerald-600">R\$ 10,00</div>
                     </div>
                 </div>
@@ -123,14 +154,14 @@
                     </div>
                 </div>
 
-                <div class="sm:col-span-2 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 p-3 rounded-2xl flex items-center space-x-3 text-xs text-amber-800">
-                    <i class="fa-solid fa-circle-info text-amber-600 text-base shrink-0"></i>
-                    <span>Sorteio em breve. Você pode consultar abaixo os números confirmados!</span>
+                <div class="sm:col-span-2 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-100 p-3 rounded-2xl flex items-center space-x-3 text-xs text-amber-800">
+                    <i class="fa-solid fa-trophy text-amber-600 text-base shrink-0"></i>
+                    <span>O número <strong>114</strong> é o grande vencedor da Cesta Natura!</span>
                 </div>
             </div>
         </div>
 
-        <!-- BARRA DE PROGRESSO DE VENDAS -->
+        <!-- BARRA DE PROGRESSO -->
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 space-y-2.5">
             <div class="flex items-center justify-between text-xs sm:text-sm">
                 <div class="font-bold text-slate-700 flex items-center space-x-2">
@@ -142,12 +173,10 @@
                 </div>
             </div>
 
-            <!-- Trilho da Barra de Progresso -->
             <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden border border-slate-200/60">
                 <div id="barra-progresso" class="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full transition-all duration-500 ease-out w-0"></div>
             </div>
 
-            <!-- Resumo das Cotas -->
             <div class="grid grid-cols-3 text-center pt-1 border-t border-slate-100 text-xs">
                 <div>
                     <span class="text-slate-400 block font-semibold">Confirmados</span>
@@ -164,21 +193,7 @@
             </div>
         </div>
 
-        <!-- LEGENDA -->
-        <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200/80 flex flex-wrap items-center justify-between gap-3 text-xs">
-            <div class="flex items-center space-x-3 font-semibold">
-                <div class="flex items-center space-x-1">
-                    <span class="w-2.5 h-2.5 bg-white border border-slate-300 rounded-full inline-block"></span>
-                    <span class="text-slate-600">Não Vendido</span>
-                </div>
-                <div class="flex items-center space-x-1">
-                    <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full inline-block"></span>
-                    <span class="text-slate-600">Confirmado</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- GRADE DE NÚMEROS E BARRINHA DE PESQUISA -->
+        <!-- GRADE DE NÚMEROS -->
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 space-y-4 vendas-encerradas">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <h2 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center space-x-1.5">
@@ -186,11 +201,10 @@
                     <span>Consultar Números:</span>
                 </h2>
 
-                <!-- BARRA DE PESQUISA E FILTROS DE CONSULTA -->
                 <div class="flex items-center space-x-2">
                     <div class="relative w-full sm:w-48">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                        <input type="number" id="input-busca" oninput="filtrarNumeros()" placeholder="Buscar seu número..." 
+                        <input type="number" id="input-busca" oninput="filtrarNumeros()" placeholder="Buscar número..." 
                             class="w-full pl-8 pr-7 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                         <button id="btn-limpar-busca" onclick="limparBusca()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs">
                             <i class="fa-solid fa-xmark"></i>
@@ -213,13 +227,13 @@
     <script>
         const CONFIG = {
             totalCotas: 500,
-            precoPorCota: 10.00
+            precoPorCota: 10.00,
+            numeroVencedor: 114 // Número sorteado
         };
 
         const SUPABASE_URL = "https://swgdyqkiaxfovvsxfwav.supabase.co"; 
         const SUPABASE_KEY = "sb_publishable_SGisG1eE-Ua5iqXUHhX11A_tQ0xeLHs";
         
-        // Inicialização do cliente Supabase v2
         const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
         let dadosCotas = {};
@@ -285,12 +299,10 @@
                 const numeroFormatado = String(i).padStart(3, '0');
                 const st = dadosCotas[i] || 'disponivel';
 
-                // Aplicação do Filtro de Pesquisa por texto
                 if (termoBusca && !numeroFormatado.includes(termoBusca) && !String(i).includes(termoBusca)) {
                     continue;
                 }
 
-                // Filtro para consultar apenas confirmados/pagos
                 if (filtroApenasPagos && st !== 'pago') {
                     continue;
                 }
@@ -301,7 +313,11 @@
                 btn.innerText = numeroFormatado;
                 btn.className = "num-btn py-2.5 text-xs font-semibold rounded-xl transition-all text-center shadow-sm";
 
-                if (st === 'pago') {
+                // Destaque especial se for o número vencedor (114)
+                if (i === CONFIG.numeroVencedor) {
+                    btn.classList.add("num-vencedor");
+                    btn.title = "NÚMERO VENCEDOR DO SORTEIO!";
+                } else if (st === 'pago') {
                     btn.classList.add("num-pago");
                     btn.title = "Número Confirmado";
                 } else {
@@ -309,9 +325,7 @@
                     btn.title = "Número Não Adquirido";
                 }
 
-                // Desabilita ação de clique (vendas encerradas)
                 btn.disabled = true;
-
                 grid.appendChild(btn);
             }
 
@@ -353,16 +367,9 @@
         }
 
         function compartilharWhatsApp() {
-            const texto = "Confira a página da nossa Rifa Solidária de LIBRAS! As vendas foram encerradas e em breve sairá o resultado do sorteio da Cesta Natura: https://rifalibras.vercel.app";
+            const texto = "Confira o resultado oficial do sorteio da Rifa Solidária de LIBRAS! O número vencedor foi o 114! Assista ao vídeo do sorteio: https://rifalibras.vercel.app";
             const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
             window.open(url, '_blank');
-        }
-
-        if (supabaseClient) {
-            supabaseClient
-                .channel('mudancas-cotas')
-                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'cotas' }, () => carregarCotas())
-                .subscribe();
         }
     </script>
 </body>
